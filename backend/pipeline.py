@@ -103,9 +103,12 @@ class CICDPipeline:
     def _run_compile(self, job: Job, compile_ok: bool) -> StageResult:
         passed = compile_ok
         message = "Compilación completada" if passed else "Error de compilación"
-        result = StageResult(stage=PipelineStage.COMPILE, passed=passed, message=message)
+        duration_ms = random.randint(15_000, 45_000) if passed else random.randint(1_000, 5_000)
+        result = StageResult(
+            stage=PipelineStage.COMPILE, passed=passed, message=message, duration_ms=duration_ms
+        )
         job.add_stage_result(result)
-        job.add_log(f"[{result.timestamp:%H:%M:%S}] {message}")
+        job.add_log(f"[{result.timestamp:%H:%M:%S}] {message} ({duration_ms // 1000}s)")
         return result
 
     def _run_tests(self, job: Job, tests_ok_probability: float) -> StageResult:
@@ -120,15 +123,21 @@ class CICDPipeline:
             else f"Pruebas fallidas ({max(0, executed - 1)}/{executed})"
         )
 
-        result = StageResult(stage=PipelineStage.TEST, passed=passed, message=message)
+        duration_ms = random.randint(10_000, 60_000) if passed else random.randint(5_000, 20_000)
+        result = StageResult(
+            stage=PipelineStage.TEST, passed=passed, message=message, duration_ms=duration_ms
+        )
         job.add_stage_result(result)
-        job.add_log(f"[{result.timestamp:%H:%M:%S}] {message}")
+        job.add_log(f"[{result.timestamp:%H:%M:%S}] {message} ({duration_ms // 1000}s)")
         return result
 
     def _run_deploy(self, job: Job) -> StageResult:
         passed = True
         message = f"Despliegue en entorno de staging - {datetime.now():%Y-%m-%d %H:%M:%S}"
-        result = StageResult(stage=PipelineStage.DEPLOY, passed=passed, message=message)
+        duration_ms = random.randint(2_000, 10_000)
+        result = StageResult(
+            stage=PipelineStage.DEPLOY, passed=passed, message=message, duration_ms=duration_ms
+        )
         job.add_stage_result(result)
-        job.add_log(f"[{result.timestamp:%H:%M:%S}] {message}")
+        job.add_log(f"[{result.timestamp:%H:%M:%S}] {message} ({duration_ms // 1000}s)")
         return result

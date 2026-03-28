@@ -31,6 +31,7 @@ class StageResult:
     passed: bool
     message: str
     timestamp: datetime = field(default_factory=datetime.now)
+    duration_ms: int = 0
 
 
 @dataclass
